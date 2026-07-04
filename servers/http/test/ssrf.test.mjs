@@ -24,6 +24,8 @@ test("classifyIp flags dangerous ranges, allows public", () => {
   assert.ok(classifyIp("100.64.0.1"));       // CGNAT
   assert.ok(classifyIp("::1"));
   assert.ok(classifyIp("fe80::1"));
+  assert.ok(classifyIp("fe90::1"));       // fe80::/10 link-local (wider range)
+  assert.ok(classifyIp("febf::1"));       // fe80::/10 upper bound
   assert.ok(classifyIp("fc00::1"));
   assert.ok(classifyIp("::ffff:127.0.0.1")); // v4-mapped loopback
 });

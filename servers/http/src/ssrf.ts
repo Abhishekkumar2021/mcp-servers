@@ -47,7 +47,7 @@ function classifyV6(ip: string): string | null {
   // IPv4-mapped (::ffff:a.b.c.d) — classify the embedded v4.
   const mapped = ip.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/);
   if (mapped) return classifyV4(mapped[1]);
-  if (ip.startsWith("fe80")) return "link-local";
+  if (/^fe[89ab]/.test(ip)) return "link-local";
   if (ip.startsWith("fc") || ip.startsWith("fd")) return "unique-local";
   return null;
 }
