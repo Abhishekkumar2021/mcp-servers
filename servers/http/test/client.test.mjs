@@ -37,6 +37,14 @@ test("fetchSafe blocks private IP without HTTP_ALLOW_PRIVATE", async () => {
   delete process.env.HTTP_ALLOW_HOSTS;
 });
 
+test("fetchSafe blocks IPv6 literal loopback (bracketed host)", async () => {
+  process.env.HTTP_ALLOW_HOSTS = "[::1]";
+  delete process.env.HTTP_ALLOW_PRIVATE;
+  const { fetchSafe } = await import(`../dist/client.js?${Date.now()}`);
+  await assert.rejects(fetchSafe({ method: "GET", url: "http://[::1]:1/x" }), /PrivateAddressBlocked/);
+  delete process.env.HTTP_ALLOW_HOSTS;
+});
+
 test("formatResponse pretty-prints JSON + redacts", async () => {
   const { formatResponse } = await import(`../dist/format.js?${Date.now()}`);
   const raw = { status: 200, statusText: "OK", headers: { authorization: "Bearer xyz", "content-type": "application/json" }, bodyBuffer: Buffer.from('{"a":1}'), timingMs: 1, finalUrl: "http://x", redirects: [] };

@@ -31,13 +31,16 @@ function withQuery(url: string, query?: Record<string, string>): string {
   return u.toString();
 }
 
-function decode(buf: Buffer, encoding?: string): Buffer {
+function decode(buf: Buffer, encoding: string | undefined, max: number): Buffer {
   try {
-    if (encoding === "gzip") return zlib.gunzipSync(buf);
-    if (encoding === "deflate") return zlib.inflateSync(buf);
-    if (encoding === "br") return zlib.brotliDecompressSync(buf);
+    // Cap decompressed output at maxResponseBytes so a small compressed body
+    // can't expand into a decompression bomb (GBs → OOM). zlib throws on
+    // overflow, which the catch below turns into a raw-buffer fallback.
+    if (encoding === "gzip") return zlib.gunzipSync(buf, { maxOutputLength: max });
+    if (encoding === "deflate") return zlib.inflateSync(buf, { maxOutputLength: max });
+    if (encoding === "br") return zlib.brotliDecompressSync(buf, { maxOutputLength: max });
   } catch {
-    return buf; // partial/truncated — return raw
+    return buf; // partial/truncated/over-limit — return raw
   }
   return buf;
 }
@@ -56,9 +59,12 @@ export async function fetchSafe(input: Input): Promise<RawResponse> {
     // node's net.connect skips the custom `lookup` for literal IP hosts, so a
     // literal private/loopback IP would bypass makeLookup's classification.
     // Re-run the same check here to keep the SSRF guard airtight per hop.
-    if (net.isIP(u.hostname) && !allowPrivate()) {
-      const reason = classifyIp(u.hostname);
-      if (reason) throw new PrivateAddressBlocked(u.hostname, [u.hostname]);
+    // URL.hostname keeps brackets on IPv6 literals ("[::1]"), which net.isIP
+    // rejects — strip them so the literal is actually validated.
+    const ipLiteral = u.hostname.replace(/^\[|\]$/g, "");
+    if (net.isIP(ipLiteral)) {
+      const reason = classifyIp(ipLiteral);
+      if (reason && !allowPrivate()) throw new PrivateAddressBlocked(u.hostname, [ipLiteral]);
     }
 
     const mod = u.protocol === "https:" ? https : http;
@@ -92,7 +98,7 @@ export async function fetchSafe(input: Input): Promise<RawResponse> {
       continue;
     }
 
-    const decoded = decode(res.body, (res.headers["content-encoding"] || "").toString().toLowerCase());
+    const decoded = decode(res.body, (res.headers["content-encoding"] || "").toString().toLowerCase(), maxResponseBytes);
     return {
       status: res.statusCode,
       statusText: res.statusMessage,
