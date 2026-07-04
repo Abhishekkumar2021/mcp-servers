@@ -139,10 +139,10 @@ takes `connection` (name) plus SQL and optional `params`.
    - Postgres: each read query runs inside `BEGIN; SET TRANSACTION READ ONLY; … ;
      ROLLBACK` — even side-effecting functions are refused by the server. Statement
      timeout applied.
-   - SQLite: `sql.js` operates on an in-memory image; read tools **never persist**
-     the buffer, so any modification is discarded. Here the guard is the primary
-     defense and non-persistence is the backstop (`sql.js` cannot hard-reject a
-     write the way a read-only file handle would — stated plainly in the README).
+   - SQLite: before each read query the adapter sets `PRAGMA query_only = ON`, so
+     the engine itself rejects any write (INSERT/UPDATE/DELETE/DDL) — true
+     engine-level read-only, symmetric with Postgres. Read tools also never persist
+     the in-memory image, as a second backstop. Write mode sets `PRAGMA query_only = OFF`.
 3. **Parameters are always bound** (positional), never string-interpolated.
 
 Write tools bypass layer 1's SELECT-only rule (by design) but still run under the
