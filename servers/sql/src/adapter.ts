@@ -52,10 +52,7 @@ export async function getAdapter(conn: Connection): Promise<Adapter> {
     const { createSqlite } = await import("./adapters/sqlite.js");
     adapter = await createSqlite(conn);
   } else {
-    // Non-literal specifier: postgres adapter is added in a later task; defer
-    // module resolution to runtime so tsc doesn't require the file to exist yet.
-    const pgModule = "./adapters/postgres.js";
-    const { createPostgres } = await import(pgModule);
+    const { createPostgres } = await import("./adapters/postgres.js");
     adapter = await createPostgres(conn);
   }
   cache.set(conn.name, adapter);
