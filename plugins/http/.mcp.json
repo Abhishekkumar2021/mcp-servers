@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "http": {
+      "command": "npx",
+      "args": ["-y", "@abhishekmcp/http"],
+      "env": {
+        "HTTP_ALLOW_HOSTS": "${HTTP_ALLOW_HOSTS}",
+        "HTTP_WRITABLE": "${HTTP_WRITABLE}"
+      }
+    }
+  }
+}

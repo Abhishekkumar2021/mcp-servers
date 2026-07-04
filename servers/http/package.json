@@ -1,0 +1,34 @@
+{
+  "name": "@abhishekmcp/http",
+  "version": "0.1.0",
+  "description": "MCP server for HTTP/REST APIs — ad-hoc requests plus saved collections and environments, with a required host allowlist and SSRF protection, from any MCP client.",
+  "mcpName": "io.github.Abhishekkumar2021/http",
+  "type": "module",
+  "bin": { "mcp-http": "dist/index.js" },
+  "files": ["dist"],
+  "publishConfig": { "access": "public", "provenance": true },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "start": "node dist/index.js",
+    "dev": "tsc && node dist/index.js",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "build:mcpb": "node scripts/build-mcpb.mjs",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": ["mcp", "modelcontextprotocol", "http", "rest", "api", "claude"],
+  "author": "Abhishek (https://github.com/Abhishekkumar2021)",
+  "license": "MIT",
+  "homepage": "https://github.com/Abhishekkumar2021/mcp-suite/tree/main/servers/http#readme",
+  "repository": { "type": "git", "url": "git+https://github.com/Abhishekkumar2021/mcp-suite.git", "directory": "servers/http" },
+  "bugs": { "url": "https://github.com/Abhishekkumar2021/mcp-suite/issues" },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0"
+  }
+}

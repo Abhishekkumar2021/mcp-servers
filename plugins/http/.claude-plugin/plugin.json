@@ -1,0 +1,10 @@
+{
+  "name": "http",
+  "version": "0.1.0",
+  "description": "HTTP/REST client for any MCP client: ad-hoc requests plus saved collections and environments, env secrets, host-allowlisted + SSRF-safe — pure Node built-ins. Runs @abhishekmcp/http via npx.",
+  "author": { "name": "Abhishek", "url": "https://github.com/Abhishekkumar2021" },
+  "homepage": "https://github.com/Abhishekkumar2021/mcp-suite/tree/main/plugins/http#readme",
+  "repository": "https://github.com/Abhishekkumar2021/mcp-suite",
+  "license": "MIT",
+  "keywords": ["http", "rest", "api", "client", "ssrf"]
+}

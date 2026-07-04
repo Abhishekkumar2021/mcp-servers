@@ -1,0 +1,37 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Abhishekkumar2021/http",
+  "title": "HTTP",
+  "description": "HTTP/REST client with saved collections, env secrets, and SSRF-safe host allowlisting.",
+  "version": "0.1.0",
+  "repository": {
+    "url": "https://github.com/Abhishekkumar2021/mcp-suite",
+    "source": "github"
+  },
+  "websiteUrl": "https://github.com/Abhishekkumar2021/mcp-suite/tree/main/servers/http#readme",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@abhishekmcp/http",
+      "version": "0.1.0",
+      "transport": { "type": "stdio" },
+      "runtimeHint": "npx",
+      "environmentVariables": [
+        {
+          "name": "HTTP_ALLOW_HOSTS",
+          "description": "Comma-separated allowed hosts (exact or *.example.com). Required — the server refuses to start without it.",
+          "isRequired": true,
+          "isSecret": false,
+          "format": "string"
+        },
+        {
+          "name": "HTTP_WRITABLE",
+          "description": "Set to 1 or true to allow mutating methods (POST/PUT/PATCH/DELETE).",
+          "isRequired": false,
+          "isSecret": false,
+          "format": "string"
+        }
+      ]
+    }
+  ]
+}

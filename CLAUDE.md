@@ -131,6 +131,33 @@ against a live server (see the README "Manual Postgres check"), mirroring notes'
 posture. Nuance: `execute_script` splits on top-level `;` and does **not** handle Postgres dollar-quoted
 bodies (`$$…$$`) — use `execute` for those.
 
+## Server architecture: `http`
+
+`servers/http/src/` is the suite's **HTTP/REST client** — ad-hoc requests plus saved collections/environments,
+built entirely on **pure Node built-ins** (`node:http`/`node:https`/`node:dns`/`node:zlib`); the only deps are
+the MCP SDK + Zod. Layered: `config.ts` (env + limits: **required `HTTP_ALLOW_HOSTS`**, `HTTP_WRITABLE`,
+`HTTP_ALLOW_PRIVATE`, `HTTP_SECRET_*`, `HTTP_DIR`, `HTTP_MAX_RESPONSE_BYTES`, `HTTP_TIMEOUT_MS`,
+`HTTP_MAX_REDIRECTS`, `HTTP_AUDIT_LOG`) → `errors.ts` (typed tool errors) → `ssrf.ts` (the security core) →
+`vars.ts` (`${var}`/`${secret.name}` substitution + `redact()`) → `store.ts` (on-disk collections +
+environments, the `RequestDef` shape) → `curl.ts` (`import_curl`/`export_curl`) → `client.ts` (`fetchSafe` —
+the SSRF-safe fetch) → `format.ts` (`formatResponse`, size-capped) → thin `index.ts` (tool registration +
+`execute`; `log.ts` `audit()`s requests).
+
+**SSRF is the point of the server.** Defense: (1) a **required host allowlist** — the server refuses to start
+without `HTTP_ALLOW_HOSTS`; a host matches an exact entry or a `*.example.com` wildcard (subdomains, not the
+apex). (2) A custom DNS `lookup` that **validates the resolved IP and pins it** for the connection (no TOCTOU
+rebind — the name that passed the check is the address dialed), plus **explicit literal-IP validation** for
+IPs written directly in the URL (including **bracketed IPv6** like `[::1]`). Private/loopback/link-local/
+unique-local/cloud-metadata (`169.254.169.254`) ranges are refused **unless `HTTP_ALLOW_PRIVATE=1`**. (3)
+**Per-redirect re-validation** — every hop re-runs the allowlist + IP checks, so a redirect to a disallowed
+host or private IP fails the request. **Secrets** come **only** from `HTTP_SECRET_*` (referenced as
+`${secret.name}`) — never written to disk, never returned, `redact()`ed from responses/`export_curl`/audit
+log; **environment variables** (`${var}`) are non-secret and stored on disk with the environment. **Mutating
+methods** (`POST`/`PUT`/`PATCH`/`DELETE`) are gated by `HTTP_WRITABLE`; `GET`/`HEAD`/`OPTIONS` always work.
+Responses are bounded by a size cap (truncates + flags, also caps decompression output), a timeout, and
+gzip/deflate/br decoding. Tests are **hermetic** — a local `127.0.0.1` `node:http` fixture (with
+`HTTP_ALLOW_PRIVATE=1`), so CI needs no network.
+
 ## Distribution (per server)
 
 Beyond npm, `notes` ships through several channels — keep them version-aligned when releasing:

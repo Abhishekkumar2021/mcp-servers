@@ -40,6 +40,7 @@ Each server lives in its own folder under [`servers/`](servers) and publishes to
 | [`github`](servers/github) | GitHub: search repos/code/issues, read repos/issues/PRs/files, notifications, create issues — OAuth device flow or token | ✅ Stable |
 | [`git`](servers/git) | Git: status, log, diff, file history, branches/tags, gated stage/commit, and remote clone/fetch/pull/push — pure-JS, no git binary | ✅ Stable |
 | [`sql`](servers/sql) | SQL databases: read-only query + schema introspection over Postgres & SQLite, gated writes | ✅ Stable |
+| [`http`](servers/http) | HTTP/REST client: ad-hoc requests + saved collections/environments, env secrets, host-allowlisted + SSRF-safe | ✅ Stable |
 
 _More on the way: a Spotify controller, and others._
 
@@ -65,6 +66,7 @@ server's README for full config.
 | [`github`](servers/github) | `/plugin install github` | `npx -y @abhishekmcp/github` | drag `github-*.mcpb` | `io.github.Abhishekkumar2021/github` |
 | [`git`](servers/git) | `/plugin install git` | `npx -y @abhishekmcp/git` | drag `git-*.mcpb` | `io.github.Abhishekkumar2021/git` |
 | [`sql`](servers/sql) | `/plugin install sql` | `npx -y @abhishekmcp/sql` | drag `sql-*.mcpb` | `io.github.Abhishekkumar2021/sql` |
+| [`http`](servers/http) | `/plugin install http` | `npx -y @abhishekmcp/http` | drag `http-*.mcpb` | `io.github.Abhishekkumar2021/http` |
 
 > `notes` defaults to `~/notes`; `files` **requires** `FS_ROOTS` (the directories it may touch). MCPB
 > bundles install via Claude Desktop → Settings → Extensions.

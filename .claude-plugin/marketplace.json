@@ -47,6 +47,14 @@
       "category": "productivity",
       "version": "0.1.0",
       "author": { "name": "Abhishek", "url": "https://github.com/Abhishekkumar2021" }
+    },
+    {
+      "name": "http",
+      "source": "./plugins/http",
+      "description": "HTTP/REST client: ad-hoc requests plus saved collections and environments, env secrets, host-allowlisted + SSRF-safe — pure Node built-ins.",
+      "category": "productivity",
+      "version": "0.1.0",
+      "author": { "name": "Abhishek", "url": "https://github.com/Abhishekkumar2021" }
     }
   ]
 }
