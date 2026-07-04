@@ -94,8 +94,8 @@ export class SqliteAdapter implements Adapter {
         name: table,
         columns,
         primaryKey,
-        foreignKeys: await this.fkeys(db, table),
-        indexes: await this.idx(db, table),
+        foreignKeys: this.fkeys(db, table),
+        indexes: this.idx(db, table),
       };
     } finally {
       db.close();
@@ -159,8 +159,8 @@ export class SqliteAdapter implements Adapter {
   }
 
   async execute(sql: string, params: unknown[]): Promise<ExecResult> {
-    const results = await this.executeScript(params.length ? [sql] : splitOrSingle(sql), params);
-    return results[results.length - 1];
+    const r = await this.executeScript([sql], params);
+    return r[r.length - 1];
   }
 
   async executeScript(statements: string[], params: unknown[] = []): Promise<ExecResult[]> {
@@ -195,10 +195,6 @@ export class SqliteAdapter implements Adapter {
   async close(): Promise<void> {
     /* nothing cached open */
   }
-}
-
-function splitOrSingle(sql: string): string[] {
-  return [sql];
 }
 
 async function persist(path: string, db: Database): Promise<void> {
