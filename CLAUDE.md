@@ -20,7 +20,7 @@ There is **no test runner or linter** configured. CI (`.github/workflows/ci.yml`
 ## Hard constraints
 
 - **stdout is the MCP transport.** Never `console.log` from a server — log to **stderr** (`console.error`) only. A stray stdout write corrupts the protocol stream.
-- **No native dependencies.** Servers run via `npx @abhishekmcp/<slug>`, so anything requiring a native build (e.g. `better-sqlite3`) is off-limits. Prefer pure-JS libraries. (The `notes` server deliberately uses MiniSearch instead of SQLite/FTS5, and hand-rolls its frontmatter parser to avoid `js-yaml`/npm-audit noise.)
+- **Prefer pure-JS / WASM dependencies.** Servers run via `npx @abhishekmcp/<slug>` on any machine, so a pure-JS or WebAssembly library is always the default (portable, `npm audit` stays clean, no toolchain to build). A native dependency is allowed **only when genuinely required** (no viable pure-JS/WASM alternative), and must be gated + documented. Note the **MCPB caveat**: the bundle copies real `node_modules`, so any native `.node` binary is platform-specific and won't run on a different OS/arch from where it was packed. (The `notes` server deliberately uses MiniSearch instead of SQLite/FTS5, and hand-rolls its frontmatter parser to avoid `js-yaml`/npm-audit noise; the `sql` server uses `sql.js` (WASM) rather than `better-sqlite3`.)
 - **Module resolution is `Node16` ESM** (`tsconfig.base.json`, `"type": "module"`). Relative imports must carry the `.js` extension even though the source is `.ts`.
 
 ## Naming standard (enforced — see NAMING.md)
@@ -111,6 +111,25 @@ self-contained — they build a real repo with isomorphic-git itself, so no syst
 isomorphic-git's `http/node` client — **HTTPS only** (no SSH), gated by `GIT_WRITABLE`, token auth via
 `GIT_TOKEN`/`GITHUB_TOKEN` (`onAuth`), errors mapped to auth/fast-forward hints with token `redact()`.
 Remote tests are network → manual; CI covers gating + `list_remotes` + token resolution + redact.
+
+## Server architecture: `sql`
+
+`servers/sql/src/` is the suite's first **database** server — read-first SQL over Postgres + SQLite behind
+one adapter interface. Layered: `config.ts` (env + limits: `DB_WRITABLE`, `DB_MAX_ROWS`,
+`DB_MAX_CELL_BYTES`, `DB_STATEMENT_TIMEOUT_MS`, `DB_SQLITE_MAX_BYTES`, `SQL_AUDIT_LOG`) → `connections.ts`
+(the **`DB_CONN_<name>` registry** — connections are referenced by *name* in tool args; the URL/credentials
+live only in env, and `redact()` scrubs credentials + connection URLs from every error/log line) →
+`guard.ts` (statement splitter + `assertReadOnly` — only single `SELECT`/`WITH`/`VALUES`) → `format.ts`
+(row/cell caps) → `adapter.ts` (the `Adapter` interface + `ResultSet`) with `adapters/{sqlite,postgres}.ts`
+→ thin `index.ts` (tool registration; write tools registered **only when `DB_WRITABLE=1`**; `log.ts`
+`audit()`s writes). **Defense-in-depth read-only:** the statement guard is layer 1; Postgres runs reads in a
+`READ ONLY` transaction; SQLite sets `PRAGMA query_only = ON` — so a guard bypass is still caught by the
+engine. **SQLite via `sql.js`** (pure WASM — portable, no `better-sqlite3` native build; the DB loads into
+memory, hence the size cap; writes re-persist the file); **Postgres via pure-JS `pg`**. Tests are hermetic
+for SQLite (build a real DB with `sql.js` itself, no server needed); Postgres is verified **manually**
+against a live server (see the README "Manual Postgres check"), mirroring notes' semantic / github's real-API
+posture. Nuance: `execute_script` splits on top-level `;` and does **not** handle Postgres dollar-quoted
+bodies (`$$…$$`) — use `execute` for those.
 
 ## Distribution (per server)
 

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://raw.githubusercontent.com/anthropics/mcpb/main/schemas/mcpb-manifest-v0.4.schema.json",
+  "manifest_version": "0.4",
+  "name": "sql",
+  "display_name": "SQL",
+  "version": "0.1.0",
+  "description": "Read-only SQL querying and schema introspection over Postgres and SQLite, with a gated write mode.",
+  "author": { "name": "Abhishek", "url": "https://github.com/Abhishekkumar2021" },
+  "homepage": "https://github.com/Abhishekkumar2021/mcp-suite/tree/main/servers/sql#readme",
+  "documentation": "https://github.com/Abhishekkumar2021/mcp-suite/tree/main/servers/sql#readme",
+  "repository": { "type": "git", "url": "https://github.com/Abhishekkumar2021/mcp-suite" },
+  "license": "MIT",
+  "keywords": ["sql", "postgres", "sqlite", "database", "productivity"],
+  "server": {
+    "type": "node",
+    "entry_point": "server/dist/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server/dist/index.js"],
+      "env": { "DB_CONN_default": "${user_config.connectionUrl}", "DB_WRITABLE": "${user_config.writable}" }
+    }
+  },
+  "user_config": {
+    "connectionUrl": { "type": "string", "title": "Connection URL", "description": "A postgres:// or sqlite: URL. Exposed to the server as connection name 'default'.", "sensitive": true, "required": true },
+    "writable": { "type": "boolean", "title": "Enable writes", "description": "Allow execute/execute_script write tools.", "default": false, "required": false }
+  },
+  "compatibility": { "claude_desktop": ">=0.10.0", "platforms": ["darwin", "win32", "linux"] }
+}
