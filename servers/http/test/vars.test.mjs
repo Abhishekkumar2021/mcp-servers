@@ -18,3 +18,9 @@ test("redact masks secret values and auth", () => {
   const out = redact("Authorization: Bearer s3cr3t\nx=s3cr3t", ["s3cr3t"]);
   assert.ok(!out.includes("s3cr3t"));
 });
+
+test("redact masks full auth header value without extra list", () => {
+  const out = redact("Authorization: Bearer abc.def.ghi");
+  assert.ok(!out.includes("abc.def.ghi"));
+  assert.match(out, /Authorization: \*\*\*/);
+});

@@ -37,7 +37,7 @@ export function redact(s: string, extra: string[] = []): string {
     if (val && val.length >= 4) out = out.replace(new RegExp(escapeRe(val), "g"), "***");
   }
   // Header lines
-  out = out.replace(/((?:authorization|cookie|set-cookie|x-api-key|x-auth-token)\s*[:=]\s*)(\S+)/gi, "$1***");
+  out = out.replace(/((?:authorization|cookie|set-cookie|x-api-key|x-auth-token)\s*[:=]\s*)([^\r\n]+)/gi, "$1***");
   // Query params
   out = out.replace(/([?&](?:token|key|secret|access_token|api_key)=)[^&\s]+/gi, "$1***");
   return out;
