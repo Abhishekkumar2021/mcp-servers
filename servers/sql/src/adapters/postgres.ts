@@ -111,7 +111,12 @@ export class PostgresAdapter implements Adapter {
   }
 
   async query(sql: string, params: unknown[], opts: { maxRows: number; maxCellBytes: number }): Promise<ResultSet> {
-    const { columns, rows } = await this.readQuery(sql, params);
+    // node-postgres buffers every row, so bound the fetch in SQL: wrap the
+    // (already read-only-guarded) user query as a subquery capped at maxRows + 1
+    // (the extra row lets capResult flag truncation). Only applied to `query`.
+    const inner = sql.replace(/[\s;]+$/, "");
+    const wrapped = `SELECT * FROM ( ${inner} ) AS _mcp_q LIMIT ${opts.maxRows + 1}`;
+    const { columns, rows } = await this.readQuery(wrapped, params);
     return capResult(columns, rows, opts);
   }
 
@@ -124,7 +129,9 @@ export class PostgresAdapter implements Adapter {
   async sample(schema = "public", table?: string, limit = 20): Promise<ResultSet> {
     const { maxRows, maxCellBytes } = limits();
     const ident = `"${schema.replace(/"/g, '""')}"."${String(table).replace(/"/g, '""')}"`;
-    return this.query(`SELECT * FROM ${ident} LIMIT ${Math.min(limit, maxRows)}`, [], { maxRows, maxCellBytes });
+    // Already bounded by its own LIMIT — run directly (no query() subquery wrap).
+    const { columns, rows } = await this.readQuery(`SELECT * FROM ${ident} LIMIT ${Math.min(limit, maxRows)}`, []);
+    return capResult(columns, rows, { maxRows, maxCellBytes });
   }
 
   async execute(sql: string, params: unknown[]): Promise<ExecResult> {

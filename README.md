@@ -95,9 +95,11 @@ Or with Claude Desktop (`claude_desktop_config.json`):
 
 A few principles hold across every server:
 
-- **Pure-JS, no native dependencies.** Servers run via `npx`/MCPB on any machine, so anything needing a
-  native build is off-limits (e.g. `notes` uses MiniSearch + WebAssembly embeddings instead of SQLite;
-  `files` uses `fast-glob` instead of ripgrep). `npm audit` stays clean.
+- **Pure-JS/WASM by default; native only when genuinely required.** Servers run via `npx`/MCPB on any
+  machine, so portable pure-JS/WebAssembly is strongly preferred and a native dependency is used only when
+  genuinely required (gated + documented). In practice these servers are dependency-light: `notes` uses
+  MiniSearch + WebAssembly embeddings, `sql` uses the `sql.js` WASM SQLite engine, and `files` uses
+  `fast-glob` instead of ripgrep. `npm audit` stays clean.
 - **Sandbox-first, layered design.** Each server keeps a thin `index.ts` (tool registration only) over
   focused modules, with a single security boundary every path must pass through (realpath-containment,
   symlink-escape rejection, atomic writes).

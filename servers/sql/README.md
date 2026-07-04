@@ -35,7 +35,7 @@ Reads are the default and are enforced with defense-in-depth; writes are **off u
 | `DB_WRITABLE` | `0` | `1`/`true` registers the write tools (`execute`, `execute_script`). |
 | `DB_MAX_ROWS` | `1000` | Max rows returned by `query`/`sample_table` (result is truncated + flagged). |
 | `DB_MAX_CELL_BYTES` | `8192` | Max bytes per cell before truncation (keeps output token-cheap). |
-| `DB_STATEMENT_TIMEOUT_MS` | `15000` | Per-statement timeout. |
+| `DB_STATEMENT_TIMEOUT_MS` | `15000` | Per-statement timeout — **Postgres only** (`SET statement_timeout`). SQLite queries run synchronously in-process (`sql.js`), so they can't be interrupted by a wall-clock timer; they're bounded by the row cap (`DB_MAX_ROWS`) and file-size cap (`DB_SQLITE_MAX_BYTES`) instead. |
 | `DB_SQLITE_MAX_BYTES` | `536870912` (512 MB) | Refuse to open a SQLite file larger than this (`sql.js` loads the DB into memory). |
 | `SQL_AUDIT_LOG` | — | Path to a JSON-lines file; each executed **write** statement is appended (never contains credentials). |
 

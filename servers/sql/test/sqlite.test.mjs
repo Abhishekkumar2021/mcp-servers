@@ -41,6 +41,17 @@ test("sqlite: introspection + read query", async () => {
   await a.close();
 });
 
+test("sqlite: query caps the fetch to maxRows (+truncated flag)", async () => {
+  const file = await makeDb();
+  const a = await getAdapter({ name: "tcap", type: "sqlite", url: `sqlite:${file}` });
+  // author has 1 row from makeDb(); add two more so there are 3 total.
+  await a.execute("INSERT INTO author (id, name) VALUES (2, 'Grace'), (3, 'Linus')", []);
+  const res = await a.query("SELECT id FROM author ORDER BY id", [], { maxRows: 2, maxCellBytes: 100 });
+  assert.equal(res.rows.length, 2);
+  assert.equal(res.truncated, true);
+  await a.close();
+});
+
 test("sqlite: read query rejects writes at engine level", async () => {
   const file = await makeDb();
   const a = await getAdapter({ name: "t2", type: "sqlite", url: `sqlite:${file}` });

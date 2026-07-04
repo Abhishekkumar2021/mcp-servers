@@ -16,6 +16,9 @@ export function limits() {
   return {
     maxRows: intEnv("DB_MAX_ROWS", 1000),
     maxCellBytes: intEnv("DB_MAX_CELL_BYTES", 8192),
+    // Applied by the Postgres adapter (SET statement_timeout). SQLite runs
+    // synchronously in-process via sql.js and is not wall-clock time-limited;
+    // it is bounded by maxRows and sqliteMaxBytes instead.
     statementTimeoutMs: intEnv("DB_STATEMENT_TIMEOUT_MS", 15000),
     sqliteMaxBytes: intEnv("DB_SQLITE_MAX_BYTES", 536870912),
   };

@@ -48,13 +48,23 @@ export class SqliteAdapter implements Adapter {
     return new SQL.Database(buf);
   }
 
-  private run(db: Database, sql: string, params: unknown[]): { columns: string[]; rows: unknown[][] } {
+  private run(
+    db: Database,
+    sql: string,
+    params: unknown[],
+    maxRows?: number,
+  ): { columns: string[]; rows: unknown[][] } {
     const stmt = db.prepare(sql);
     try {
       if (params.length) stmt.bind(params as never[]);
       const columns = stmt.getColumnNames();
       const rows: unknown[][] = [];
-      while (stmt.step()) rows.push(stmt.get() as unknown[]);
+      // Cap the collection loop so a huge SELECT never fully materializes.
+      // Collect at most maxRows + 1 (the extra row lets capResult flag truncation).
+      while (stmt.step()) {
+        rows.push(stmt.get() as unknown[]);
+        if (maxRows !== undefined && rows.length > maxRows) break;
+      }
       return { columns, rows };
     } finally {
       stmt.free();
@@ -141,7 +151,7 @@ export class SqliteAdapter implements Adapter {
     const db = await this.open();
     try {
       db.run("PRAGMA query_only = ON");
-      const { columns, rows } = this.run(db, sql, params);
+      const { columns, rows } = this.run(db, sql, params, opts.maxRows);
       return capResult(columns, rows, opts);
     } finally {
       db.close();
