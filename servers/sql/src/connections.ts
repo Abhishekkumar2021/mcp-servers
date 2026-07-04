@@ -34,5 +34,7 @@ export function getConnection(name: string): Connection {
 
 /** Mask credentials and full connection URLs in any user-facing string. */
 export function redact(s: string): string {
-  return s.replace(/([a-z]+:\/\/)([^\s/@]+)@/gi, "$1***@");
+  return s
+    .replace(/([a-z]+:\/\/)([^\s/@]+)@/gi, "$1***@")
+    .replace(/([?&](?:password|pwd)=)[^&\s]+/gi, "$1***");
 }

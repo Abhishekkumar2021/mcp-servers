@@ -33,3 +33,9 @@ test("redact hides credentials", () => {
   assert.ok(!out.includes("secret"));
   assert.ok(out.includes("postgres://"));
 });
+
+test("redact hides password in URL query params", () => {
+  const out = redact("postgres://host/db?password=secret&sslmode=require");
+  assert.ok(!out.includes("secret"));
+  assert.ok(out.includes("sslmode=require"));
+});
