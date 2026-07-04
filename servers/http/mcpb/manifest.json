@@ -1,0 +1,28 @@
+{
+  "$schema": "https://raw.githubusercontent.com/anthropics/mcpb/main/schemas/mcpb-manifest-v0.4.schema.json",
+  "manifest_version": "0.4",
+  "name": "http",
+  "display_name": "HTTP",
+  "version": "0.1.0",
+  "description": "HTTP/REST client: ad-hoc requests plus saved collections and environments, with a required host allowlist and SSRF protection.",
+  "author": { "name": "Abhishek", "url": "https://github.com/Abhishekkumar2021" },
+  "homepage": "https://github.com/Abhishekkumar2021/mcp-suite/tree/main/servers/http#readme",
+  "documentation": "https://github.com/Abhishekkumar2021/mcp-suite/tree/main/servers/http#readme",
+  "repository": { "type": "git", "url": "https://github.com/Abhishekkumar2021/mcp-suite" },
+  "license": "MIT",
+  "keywords": ["http", "rest", "api", "client", "productivity"],
+  "server": {
+    "type": "node",
+    "entry_point": "server/dist/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server/dist/index.js"],
+      "env": { "HTTP_ALLOW_HOSTS": "${user_config.allowHosts}", "HTTP_WRITABLE": "${user_config.writable}" }
+    }
+  },
+  "user_config": {
+    "allowHosts": { "type": "string", "title": "Allowed hosts", "description": "Comma-separated hosts the client may reach (exact or *.example.com). Required.", "required": true },
+    "writable": { "type": "boolean", "title": "Enable writes", "description": "Allow POST/PUT/PATCH/DELETE.", "default": false, "required": false }
+  },
+  "compatibility": { "claude_desktop": ">=0.10.0", "platforms": ["darwin", "win32", "linux"] }
+}
