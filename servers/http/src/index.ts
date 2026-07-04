@@ -42,7 +42,7 @@ async function execute(def: RequestDef, environment?: string) {
   assertMethodAllowed(def.method);
   const { req, secrets } = resolve(def, environment);
   const raw = await fetchSafe(req);
-  audit({ method: def.method, url: req.url, status: raw.status });
+  audit({ method: def.method, url: req.url, status: raw.status }, secrets);
   return json(formatResponse(raw, secrets));
 }
 

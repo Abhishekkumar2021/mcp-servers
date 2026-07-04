@@ -50,6 +50,7 @@ export async function fetchSafe(input: Input): Promise<RawResponse> {
   const start = Date.now();
   const redirects: string[] = [];
   let current = withQuery(input.url, input.query);
+  let headers = input.headers;
 
   for (let hop = 0; ; hop++) {
     if (hop > maxRedirects) throw new TooManyRedirects(maxRedirects);
@@ -71,7 +72,7 @@ export async function fetchSafe(input: Input): Promise<RawResponse> {
     const res = await new Promise<{ statusCode: number; statusMessage: string; headers: Record<string, string>; body: Buffer }>((resolve, reject) => {
       const req = mod.request(
         u,
-        { method: input.method, headers: input.headers, lookup: makeLookup() as any },
+        { method: input.method, headers, lookup: makeLookup() as any },
         (r) => {
           const chunks: Buffer[] = [];
           let total = 0;
@@ -81,6 +82,7 @@ export async function fetchSafe(input: Input): Promise<RawResponse> {
             if (total <= maxResponseBytes) chunks.push(c);
             else if (!truncated) { truncated = true; chunks.push(c.subarray(0, Math.max(0, maxResponseBytes - (total - c.length)))); r.destroy(); }
           });
+          r.on("error", reject);
           r.on("end", () => resolve({ statusCode: r.statusCode ?? 0, statusMessage: r.statusMessage ?? "", headers: r.headers as Record<string, string>, body: Buffer.concat(chunks) }));
           r.on("close", () => resolve({ statusCode: r.statusCode ?? 0, statusMessage: r.statusMessage ?? "", headers: r.headers as Record<string, string>, body: Buffer.concat(chunks) }));
         },
@@ -95,6 +97,17 @@ export async function fetchSafe(input: Input): Promise<RawResponse> {
     if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
       redirects.push(current);
       current = new URL(res.headers.location, u).toString();
+      // Cross-origin redirect: drop credential headers so Authorization/Cookie
+      // aren't replayed to a different host. Work on a copy since input.headers
+      // is reused across hops.
+      if (headers && new URL(current).host.toLowerCase() !== u.host.toLowerCase()) {
+        headers = Object.fromEntries(
+          Object.entries(headers).filter(([k]) => {
+            const lk = k.toLowerCase();
+            return lk !== "authorization" && lk !== "cookie";
+          }),
+        );
+      }
       continue;
     }
 
