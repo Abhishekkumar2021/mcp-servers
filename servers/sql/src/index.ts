@@ -10,8 +10,8 @@ import { z } from "zod";
 import { VERSION, isWritable, limits } from "./config.js";
 import { getConnection, listConnections, redact } from "./connections.js";
 import { getAdapter } from "./adapter.js";
-import { assertReadOnly } from "./guard.js";
-import { logInfo } from "./log.js";
+import { assertReadOnly, splitStatements } from "./guard.js";
+import { logInfo, audit } from "./log.js";
 
 const server = new McpServer({ name: "mcp-sql-server", version: VERSION });
 
@@ -133,7 +133,36 @@ server.registerTool(
   },
 );
 
-// Task 7 inserts write tools here (gated by isWritable()).
+if (isWritable()) {
+  server.registerTool(
+    "execute",
+    { title: "Execute statement", description: "Run one write statement (INSERT/UPDATE/DELETE/DDL). Requires DB_WRITABLE.", inputSchema: { connection: connArg, sql: z.string(), params: paramsArg }, annotations: { destructiveHint: true } },
+    async ({ connection, sql, params }) => {
+      try {
+        const r = await (await getAdapter(getConnection(connection))).execute(sql, params ?? []);
+        audit({ tool: "execute", connection, sql });
+        return json(r);
+      } catch (err) {
+        return fail(err);
+      }
+    },
+  );
+
+  server.registerTool(
+    "execute_script",
+    { title: "Execute script", description: "Run multiple statements in a single transaction (rolls back on error). Requires DB_WRITABLE.", inputSchema: { connection: connArg, sql: z.string() }, annotations: { destructiveHint: true } },
+    async ({ connection, sql }) => {
+      try {
+        const statements = splitStatements(sql);
+        const r = await (await getAdapter(getConnection(connection))).executeScript(statements);
+        audit({ tool: "execute_script", connection, statements: statements.length });
+        return json(r);
+      } catch (err) {
+        return fail(err);
+      }
+    },
+  );
+}
 
 async function main() {
   await server.connect(new StdioServerTransport());
