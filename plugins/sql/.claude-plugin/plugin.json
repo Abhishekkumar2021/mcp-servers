@@ -1,0 +1,10 @@
+{
+  "name": "sql",
+  "version": "0.1.0",
+  "description": "SQL databases for any MCP client: read-only query + schema introspection over Postgres & SQLite, with gated writes. Named connections via DB_CONN_<name>. Runs @abhishekmcp/sql via npx.",
+  "author": { "name": "Abhishek", "url": "https://github.com/Abhishekkumar2021" },
+  "homepage": "https://github.com/Abhishekkumar2021/mcp-suite/tree/main/plugins/sql#readme",
+  "repository": "https://github.com/Abhishekkumar2021/mcp-suite",
+  "license": "MIT",
+  "keywords": ["sql", "postgres", "sqlite", "database"]
+}

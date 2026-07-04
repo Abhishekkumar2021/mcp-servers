@@ -39,6 +39,7 @@ Each server lives in its own folder under [`servers/`](servers) and publishes to
 | [`files`](servers/files) | Sandboxed local filesystem: read, glob + content search, token-efficient edits, copy/move, soft-delete trash, zip, checksums, and dedup | ✅ Stable |
 | [`github`](servers/github) | GitHub: search repos/code/issues, read repos/issues/PRs/files, notifications, create issues — OAuth device flow or token | ✅ Stable |
 | [`git`](servers/git) | Git: status, log, diff, file history, branches/tags, gated stage/commit, and remote clone/fetch/pull/push — pure-JS, no git binary | ✅ Stable |
+| [`sql`](servers/sql) | SQL databases: read-only query + schema introspection over Postgres & SQLite, gated writes | ✅ Stable |
 
 _More on the way: a Spotify controller, and others._
 
@@ -63,6 +64,7 @@ server's README for full config.
 | [`files`](servers/files) | `/plugin install files` | `npx -y @abhishekmcp/files` | drag `files-*.mcpb` | `io.github.Abhishekkumar2021/files` |
 | [`github`](servers/github) | `/plugin install github` | `npx -y @abhishekmcp/github` | drag `github-*.mcpb` | `io.github.Abhishekkumar2021/github` |
 | [`git`](servers/git) | `/plugin install git` | `npx -y @abhishekmcp/git` | drag `git-*.mcpb` | `io.github.Abhishekkumar2021/git` |
+| [`sql`](servers/sql) | `/plugin install sql` | `npx -y @abhishekmcp/sql` | drag `sql-*.mcpb` | `io.github.Abhishekkumar2021/sql` |
 
 > `notes` defaults to `~/notes`; `files` **requires** `FS_ROOTS` (the directories it may touch). MCPB
 > bundles install via Claude Desktop → Settings → Extensions.
@@ -93,9 +95,11 @@ Or with Claude Desktop (`claude_desktop_config.json`):
 
 A few principles hold across every server:
 
-- **Pure-JS, no native dependencies.** Servers run via `npx`/MCPB on any machine, so anything needing a
-  native build is off-limits (e.g. `notes` uses MiniSearch + WebAssembly embeddings instead of SQLite;
-  `files` uses `fast-glob` instead of ripgrep). `npm audit` stays clean.
+- **Pure-JS/WASM by default; native only when genuinely required.** Servers run via `npx`/MCPB on any
+  machine, so portable pure-JS/WebAssembly is strongly preferred and a native dependency is used only when
+  genuinely required (gated + documented). In practice these servers are dependency-light: `notes` uses
+  MiniSearch + WebAssembly embeddings, `sql` uses the `sql.js` WASM SQLite engine, and `files` uses
+  `fast-glob` instead of ripgrep. `npm audit` stays clean.
 - **Sandbox-first, layered design.** Each server keeps a thin `index.ts` (tool registration only) over
   focused modules, with a single security boundary every path must pass through (realpath-containment,
   symlink-escape rejection, atomic writes).

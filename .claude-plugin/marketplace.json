@@ -39,6 +39,14 @@
       "category": "productivity",
       "version": "0.2.0",
       "author": { "name": "Abhishek", "url": "https://github.com/Abhishekkumar2021" }
+    },
+    {
+      "name": "sql",
+      "source": "./plugins/sql",
+      "description": "SQL: read-only query + schema introspection over Postgres & SQLite, with gated writes — named connections, pure-JS, no native deps.",
+      "category": "productivity",
+      "version": "0.1.0",
+      "author": { "name": "Abhishek", "url": "https://github.com/Abhishekkumar2021" }
     }
   ]
 }

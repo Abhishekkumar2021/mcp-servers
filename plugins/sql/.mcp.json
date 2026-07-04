@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "sql": {
+      "command": "npx",
+      "args": ["-y", "@abhishekmcp/sql"],
+      "env": { "DB_CONN_default": "${DB_CONN_default}", "DB_WRITABLE": "${DB_WRITABLE}" }
+    }
+  }
+}
