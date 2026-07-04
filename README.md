@@ -61,8 +61,8 @@ server's README for full config.
 |--------|--------------------|------------------|-----------------------|--------------|
 | [`notes`](servers/notes) | `/plugin install notes` | `npx -y @abhishekmcp/notes` | drag `notes-*.mcpb` from the [latest release](https://github.com/Abhishekkumar2021/mcp-suite/releases) | `io.github.Abhishekkumar2021/notes` |
 | [`files`](servers/files) | `/plugin install files` | `npx -y @abhishekmcp/files` | drag `files-*.mcpb` | `io.github.Abhishekkumar2021/files` |
-| [`github`](servers/github) | `/plugin install github` | `npx -y @abhishekmcp/github` | — | `io.github.Abhishekkumar2021/github` |
-| [`git`](servers/git) | `/plugin install git` | `npx -y @abhishekmcp/git` | — | `io.github.Abhishekkumar2021/git` |
+| [`github`](servers/github) | `/plugin install github` | `npx -y @abhishekmcp/github` | drag `github-*.mcpb` | `io.github.Abhishekkumar2021/github` |
+| [`git`](servers/git) | `/plugin install git` | `npx -y @abhishekmcp/git` | drag `git-*.mcpb` | `io.github.Abhishekkumar2021/git` |
 
 > `notes` defaults to `~/notes`; `files` **requires** `FS_ROOTS` (the directories it may touch). MCPB
 > bundles install via Claude Desktop → Settings → Extensions.

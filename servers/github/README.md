@@ -66,6 +66,8 @@ claude mcp add github --env GITHUB_TOKEN=<pat> -- npx -y @abhishekmcp/github
 }
 ```
 
+**Claude Desktop (MCPB):** drag `github-*.mcpb` from the [latest release](https://github.com/Abhishekkumar2021/mcp-suite/releases) into Settings → Extensions, then paste a personal access token (or an OAuth client ID for device-flow login). Build it locally with `npm run build:mcpb -w servers/github`.
+
 ## License
 
 MIT

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://raw.githubusercontent.com/anthropics/mcpb/main/schemas/mcpb-manifest-v0.4.schema.json",
+  "manifest_version": "0.4",
+  "name": "github",
+  "display_name": "GitHub",
+  "version": "0.2.0",
+  "description": "GitHub: search repos/code/issues, read repos/issues/PRs/files, notifications, and create issues — authenticated via a personal access token or OAuth device flow.",
+  "author": { "name": "Abhishek", "url": "https://github.com/Abhishekkumar2021" },
+  "homepage": "https://github.com/Abhishekkumar2021/mcp-suite/tree/main/servers/github#readme",
+  "documentation": "https://github.com/Abhishekkumar2021/mcp-suite/tree/main/servers/github#readme",
+  "repository": { "type": "git", "url": "https://github.com/Abhishekkumar2021/mcp-suite" },
+  "license": "MIT",
+  "keywords": ["github", "octokit", "issues", "pull-requests", "productivity"],
+  "server": {
+    "type": "node",
+    "entry_point": "server/dist/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server/dist/index.js"],
+      "env": {
+        "GITHUB_TOKEN": "${user_config.token}",
+        "GITHUB_CLIENT_ID": "${user_config.clientId}",
+        "GITHUB_READONLY": "${user_config.readOnly}"
+      }
+    }
+  },
+  "user_config": {
+    "token": {
+      "type": "string",
+      "title": "Personal access token",
+      "description": "A GitHub PAT. The simplest way to authenticate. Leave blank to use OAuth device flow instead (requires a client ID below).",
+      "sensitive": true,
+      "required": false
+    },
+    "clientId": {
+      "type": "string",
+      "title": "OAuth client ID",
+      "description": "Client ID of a GitHub OAuth App with device flow enabled. Only needed for browser login when no token is provided.",
+      "required": false
+    },
+    "readOnly": {
+      "type": "boolean",
+      "title": "Read-only",
+      "description": "Disable write tools such as creating issues (search/read only).",
+      "default": false,
+      "required": false
+    }
+  },
+  "compatibility": {
+    "claude_desktop": ">=0.10.0",
+    "platforms": ["darwin", "win32", "linux"]
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "$schema": "https://raw.githubusercontent.com/anthropics/mcpb/main/schemas/mcpb-manifest-v0.4.schema.json",
+  "manifest_version": "0.4",
+  "name": "git",
+  "display_name": "Git",
+  "version": "0.2.0",
+  "description": "Local Git repositories: status, log, diff, file history, branches/tags, gated stage/commit, and remote clone/fetch/pull/push — pure-JS, no git binary.",
+  "author": { "name": "Abhishek", "url": "https://github.com/Abhishekkumar2021" },
+  "homepage": "https://github.com/Abhishekkumar2021/mcp-suite/tree/main/servers/git#readme",
+  "documentation": "https://github.com/Abhishekkumar2021/mcp-suite/tree/main/servers/git#readme",
+  "repository": { "type": "git", "url": "https://github.com/Abhishekkumar2021/mcp-suite" },
+  "license": "MIT",
+  "keywords": ["git", "isomorphic-git", "version-control", "diff", "productivity"],
+  "server": {
+    "type": "node",
+    "entry_point": "server/dist/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server/dist/index.js"],
+      "env": {
+        "GIT_ROOTS": "${user_config.rootDir}",
+        "GIT_WRITABLE": "${user_config.writable}",
+        "GIT_TOKEN": "${user_config.token}"
+      }
+    }
+  },
+  "user_config": {
+    "rootDir": {
+      "type": "directory",
+      "title": "Allowed repo root",
+      "description": "The directory this server may access Git repositories within (sandboxed to this path).",
+      "default": "${HOME}",
+      "required": true
+    },
+    "writable": {
+      "type": "boolean",
+      "title": "Enable writes",
+      "description": "Enable stage/commit/branch/checkout and remote clone/fetch/pull/push tools.",
+      "default": false,
+      "required": false
+    },
+    "token": {
+      "type": "string",
+      "title": "Git token",
+      "description": "Optional personal access token for HTTPS remote auth (private clone/fetch/pull/push).",
+      "sensitive": true,
+      "required": false
+    }
+  },
+  "compatibility": {
+    "claude_desktop": ">=0.10.0",
+    "platforms": ["darwin", "win32", "linux"]
+  }
+}

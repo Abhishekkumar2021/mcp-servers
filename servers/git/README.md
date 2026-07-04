@@ -53,6 +53,8 @@ claude mcp add git --env GIT_ROOTS=$HOME/code -- npx -y @abhishekmcp/git
 }
 ```
 
+**Claude Desktop (MCPB):** drag `git-*.mcpb` from the [latest release](https://github.com/Abhishekkumar2021/mcp-suite/releases) into Settings → Extensions, then set the allowed repo root. Build it locally with `npm run build:mcpb -w servers/git`.
+
 ## License
 
 MIT
