@@ -1,0 +1,38 @@
+{
+  "name": "@abhishekmcp/sql",
+  "version": "0.1.0",
+  "description": "MCP server for SQL databases — read-only querying and schema introspection over Postgres and SQLite, with a gated write mode, from any MCP client.",
+  "mcpName": "io.github.Abhishekkumar2021/sql",
+  "type": "module",
+  "bin": { "mcp-sql": "dist/index.js" },
+  "files": ["dist"],
+  "publishConfig": { "access": "public", "provenance": true },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "start": "node dist/index.js",
+    "dev": "tsc && node dist/index.js",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "build:mcpb": "node scripts/build-mcpb.mjs",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": ["mcp", "modelcontextprotocol", "sql", "postgres", "sqlite", "claude"],
+  "author": "Abhishek (https://github.com/Abhishekkumar2021)",
+  "license": "MIT",
+  "homepage": "https://github.com/Abhishekkumar2021/mcp-suite/tree/main/servers/sql#readme",
+  "repository": { "type": "git", "url": "git+https://github.com/Abhishekkumar2021/mcp-suite.git", "directory": "servers/sql" },
+  "bugs": { "url": "https://github.com/Abhishekkumar2021/mcp-suite/issues" },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "pg": "^8.13.0",
+    "sql.js": "^1.14.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/pg": "^8.11.0",
+    "@types/sql.js": "^1.4.9",
+    "typescript": "^5.6.0"
+  }
+}
